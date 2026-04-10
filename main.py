@@ -1,32 +1,42 @@
 import os
 from fastapi import FastAPI
 import mysql.connector
-from urllib.parse import urlparse
 
 app = FastAPI()
 
 # =========================================
-# CONEXÃO COM BANCO (RAILWAY - DATABASE_URL)
+# CONEXÃO BANCO (VERSÃO ROBUSTA)
 # =========================================
 def conectar():
     try:
         url = os.getenv("DATABASE_URL")
 
         if not url:
-            raise Exception("DATABASE_URL não definida")
+            raise Exception("DATABASE_URL não encontrada")
 
-        parsed = urlparse(url)
+        # DEBUG
+        print("DATABASE_URL:", url)
+
+        # Exemplo:
+        # mysql://user:pass@host:port/database
+
+        url = url.replace("mysql://", "")
+
+        user_pass, host_db = url.split("@")
+        user, password = user_pass.split(":")
+        host_port, database = host_db.split("/")
+        host, port = host_port.split(":")
 
         return mysql.connector.connect(
-            host=parsed.hostname,
-            user=parsed.username,
-            password=parsed.password,
-            database=parsed.path.replace("/", ""),
-            port=parsed.port or 3306
+            host=host,
+            user=user,
+            password=password,
+            database=database,
+            port=int(port)
         )
 
     except Exception as e:
-        print("ERRO CONEXÃO:", e)
+        print("ERRO CONEXÃO:", str(e))
         raise e
 
 
@@ -39,7 +49,7 @@ def home():
 
 
 # =========================================
-# TESTE BANCO
+# TESTE BANCO (COM DEBUG)
 # =========================================
 @app.get("/teste-banco")
 def teste_banco():
@@ -47,38 +57,22 @@ def teste_banco():
         conn = conectar()
         cursor = conn.cursor()
 
+        cursor.execute("SHOW TABLES")
+        tabelas = cursor.fetchall()
+
         cursor.execute("SELECT COUNT(*) FROM usuarios")
         total = cursor.fetchone()[0]
 
         cursor.close()
         conn.close()
 
-        return {"usuarios": total}
+        return {
+            "status": "ok",
+            "tabelas": tabelas,
+            "usuarios": total
+        }
 
     except Exception as e:
-        return {"erro": str(e)}
-
-
-# =========================================
-# CRIAR USUÁRIO
-# =========================================
-@app.post("/usuarios")
-def criar_usuario(nome: str, telefone: str):
-    try:
-        conn = conectar()
-        cursor = conn.cursor()
-
-        cursor.execute(
-            "INSERT INTO usuarios (nome, telefone) VALUES (%s, %s)",
-            (nome, telefone)
-        )
-
-        conn.commit()
-
-        cursor.close()
-        conn.close()
-
-        return {"msg": "Usuário criado com sucesso"}
-
-    except Exception as e:
-        return {"erro": str(e)}
+        return {
+            "erro": str(e)
+        }
