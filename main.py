@@ -4,13 +4,21 @@ import mysql.connector
 
 app = FastAPI()
 
+import os
+import mysql.connector
+from urllib.parse import urlparse
+
 def conectar():
+    url = os.getenv("DATABASE_URL")
+
+    parsed = urlparse(url)
+
     return mysql.connector.connect(
-        host=os.getenv("DB_HOST"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASS"),
-        database=os.getenv("DB_NAME"),
-        port=int(os.getenv("DB_PORT", 3306))
+        host=parsed.hostname,
+        user=parsed.username,
+        password=parsed.password,
+        database=parsed.path[1:],
+        port=parsed.port
     )
 
 @app.get("/")
