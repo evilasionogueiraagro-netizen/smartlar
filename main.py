@@ -4,75 +4,41 @@ import mysql.connector
 
 app = FastAPI()
 
-# =========================================
-# CONEXÃO BANCO (VERSÃO ROBUSTA)
-# =========================================
 def conectar():
-    try:
-        url = os.getenv("DATABASE_URL")
+    url = os.getenv("DATABASE_URL")
 
-        if not url:
-            raise Exception("DATABASE_URL não encontrada")
+    if not url:
+        raise Exception("DATABASE_URL não encontrada")
 
-        # DEBUG
-        print("DATABASE_URL:", url)
+    url = url.replace("mysql://", "")
 
-        # Exemplo:
-        # mysql://user:pass@host:port/database
+    user_pass, host_db = url.split("@")
+    user, password = user_pass.split(":")
+    host_port, database = host_db.split("/")
+    host, port = host_port.split(":")
 
-        url = url.replace("mysql://", "")
+    return mysql.connector.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=database,
+        port=int(port)
+    )
 
-        user_pass, host_db = url.split("@")
-        user, password = user_pass.split(":")
-        host_port, database = host_db.split("/")
-        host, port = host_port.split(":")
-
-        return mysql.connector.connect(
-            host=host,
-            user=user,
-            password=password,
-            database=database,
-            port=int(port)
-        )
-
-    except Exception as e:
-        print("ERRO CONEXÃO:", str(e))
-        raise e
-
-
-# =========================================
-# HOME
-# =========================================
 @app.get("/")
 def home():
     return {"status": "SmartLar online 🚀"}
 
-
-# =========================================
-# TESTE BANCO (COM DEBUG)
-# =========================================
 @app.get("/teste-banco")
-def teste_banco():
+def teste():
     try:
         conn = conectar()
         cursor = conn.cursor()
 
-        cursor.execute("SHOW TABLES")
-        tabelas = cursor.fetchall()
-
         cursor.execute("SELECT COUNT(*) FROM usuarios")
         total = cursor.fetchone()[0]
 
-        cursor.close()
-        conn.close()
-
-        return {
-            "status": "ok",
-            "tabelas": tabelas,
-            "usuarios": total
-        }
+        return {"usuarios": total}
 
     except Exception as e:
-        return {
-            "erro": str(e)
-        }
+        return {"erro": str(e)}
