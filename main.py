@@ -291,8 +291,10 @@ def gerar_pdf(contrato_id: int):
     config = pdfkit.configuration(
         wkhtmltopdf=os.getenv("WKHTMLTOPDF_PATH", "/usr/bin/wkhtmltopdf")
     )
+    
 
     pdfkit.from_string(html, caminho_pdf, configuration=config)
+    
 
     return FileResponse(
         caminho_pdf,
