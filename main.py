@@ -229,3 +229,12 @@ def teste():
     conn.close()
 
     return {"usuarios": total}
+@app.get("/debug-db")
+def debug():
+    import os
+    return {
+        "host": os.getenv("MYSQLHOST"),
+        "user": os.getenv("MYSQLUSER"),
+        "db": os.getenv("MYSQLDATABASE"),
+        "port": os.getenv("MYSQLPORT")
+    }
