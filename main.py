@@ -151,7 +151,11 @@ def gerar_html(contrato_id: int):
     cursor.execute("SELECT * FROM usuarios LIMIT 1")
     locador = cursor.fetchone()
 
-    cursor.execute("""SELECT status FROM assinaturas WHERE contrato_id=%s ORDER BY id DESC LIMIT 1""", (contrato_id,))
+    cursor.execute("""
+        SELECT status FROM assinaturas 
+        WHERE contrato_id=%s 
+        ORDER BY id DESC LIMIT 1
+    """, (contrato_id,))
 
 assinatura = cursor.fetchone()
 
