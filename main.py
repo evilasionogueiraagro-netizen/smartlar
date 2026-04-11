@@ -171,7 +171,16 @@ def gerar_html(contrato_id: int):
     auto_reload=True
     )
     env.cache = {}
+    cursor.execute("""
+SELECT status, data_assinatura FROM assinaturas
+WHERE contrato_id=%s
+ORDER BY id DESC LIMIT 1
+""", (contrato_id,))
 
+assinatura = cursor.fetchone()
+
+status = assinatura["status"] if assinatura else "pendente"
+data_assinatura = assinatura["data_assinatura"] if assinatura else "-"
     template = env.get_template("contrato.html")
 
     html = template.render({
