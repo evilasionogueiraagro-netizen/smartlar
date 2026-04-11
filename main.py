@@ -141,6 +141,10 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 from fastapi.responses import FileResponse
 
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.units import cm
+
 @app.get("/contratos/pdf/{contrato_id}")
 def gerar_pdf(contrato_id: int):
 
@@ -164,23 +168,46 @@ def gerar_pdf(contrato_id: int):
 
     caminho_pdf = f"contrato_{contrato_id}.pdf"
 
-    doc = SimpleDocTemplate(caminho_pdf)
-    styles = getSampleStyleSheet()
+    doc = SimpleDocTemplate(
+        caminho_pdf,
+        rightMargin=2*cm,
+        leftMargin=2*cm,
+        topMargin=2*cm,
+        bottomMargin=2*cm
+    )
 
+    styles = getSampleStyleSheet()
     conteudo = []
 
-    conteudo.append(Paragraph("CONTRATO DE LOCAÇÃO", styles["Title"]))
-    conteudo.append(Paragraph(f"Locador: {locador['nome']}", styles["Normal"]))
-    conteudo.append(Paragraph(f"Inquilino: {inquilino['nome']}", styles["Normal"]))
-    conteudo.append(Paragraph(f"CPF: {inquilino['cpf']}", styles["Normal"]))
-    conteudo.append(Paragraph(f"Imóvel: {imovel['descricao']}", styles["Normal"]))
-    conteudo.append(Paragraph(f"Valor: R$ {contrato['valor']}", styles["Normal"]))
-    conteudo.append(Paragraph(f"Início: {contrato['data_inicio']}", styles["Normal"]))
-    conteudo.append(Paragraph(f"Fim: {contrato['data_fim']}", styles["Normal"]))
+    conteudo.append(Paragraph("<b>CONTRATO DE LOCAÇÃO</b>", styles["Title"]))
+    conteudo.append(Spacer(1, 20))
+
+    conteudo.append(Paragraph(f"<b>LOCADOR:</b> {locador['nome']}", styles["Normal"]))
+    conteudo.append(Paragraph(f"<b>INQUILINO:</b> {inquilino['nome']}", styles["Normal"]))
+    conteudo.append(Paragraph(f"<b>CPF:</b> {inquilino['cpf']}", styles["Normal"]))
+    conteudo.append(Spacer(1, 15))
+
+    conteudo.append(Paragraph(f"<b>IMÓVEL:</b> {imovel['descricao']}", styles["Normal"]))
+    conteudo.append(Spacer(1, 15))
+
+    conteudo.append(Paragraph(f"<b>VALOR:</b> R$ {contrato['valor']}", styles["Normal"]))
+    conteudo.append(Paragraph(f"<b>INÍCIO:</b> {contrato['data_inicio']}", styles["Normal"]))
+    conteudo.append(Paragraph(f"<b>FIM:</b> {contrato['data_fim']}", styles["Normal"]))
+    conteudo.append(Spacer(1, 30))
+
+    conteudo.append(Paragraph("Manaus, ____/____/______", styles["Normal"]))
+    conteudo.append(Spacer(1, 40))
+
+    conteudo.append(Paragraph("_____________________________", styles["Normal"]))
+    conteudo.append(Paragraph("LOCADOR", styles["Normal"]))
+    conteudo.append(Spacer(1, 30))
+
+    conteudo.append(Paragraph("_____________________________", styles["Normal"]))
+    conteudo.append(Paragraph("INQUILINO", styles["Normal"]))
 
     doc.build(conteudo)
 
-    return FileResponse(caminho_pdf, media_type="application/pdf", filename="contrato.pdf")
+    return FileResponse(caminho_pdf, media_type="application/pdf")
 
 # ================================
 # GERAR CÓDIGO ASSINATURA
