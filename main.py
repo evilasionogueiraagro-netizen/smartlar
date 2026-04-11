@@ -187,7 +187,8 @@ def gerar_html(contrato_id: int):
 
     template = env.get_template("contrato.html")
 
-    html = template.render({
+    html = template.render({ 
+        
 
         # LOCADOR
         "nome_locador": locador["nome"],
@@ -231,6 +232,8 @@ def gerar_html(contrato_id: int):
         # ASSINATURA
         "status_assinatura": status,
         "data_assinatura": data_assinatura
+        "qr_code": qr_path,
+        "ip_assinatura": assinatura["ip"] if assinatura else "-"
     })
 
     return HTMLResponse(content=html)
