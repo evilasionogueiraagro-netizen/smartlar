@@ -213,28 +213,68 @@ def gerar_html(contrato_id: int):
     return HTMLResponse(content=html)
 
 # ================================
+# ENVIAR CONTRATO
+# ================================
+import random
+from datetime import datetime
+
+@app.post("/assinatura/enviar/{contrato_id}")
+def enviar_codigo(contrato_id: int):
+
+    codigo = str(random.randint(100000, 999999))
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    # pega inquilino do contrato
+    cursor.execute("SELECT inquilino_id FROM contratos WHERE id=%s", (contrato_id,))
+    contrato = cursor.fetchone()
+
+    if not contrato:
+        return {"erro": "Contrato não encontrado"}
+
+    inquilino_id = contrato[0]
+
+    cursor.execute("""
+        INSERT INTO assinaturas (contrato_id, inquilino_id, codigo, data_envio)
+        VALUES (%s, %s, %s, %s)
+    """, (contrato_id, inquilino_id, codigo, datetime.now()))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return {
+        "msg": "Código gerado",
+        "codigo": codigo  # depois trocamos por WhatsApp
+    }
+# ================================
 # VALIDAR ASSINATURA
 # ================================
+from fastapi import Request
+
 @app.post("/assinatura/validar")
-def validar(inquilino_id: int, codigo: str, request: Request):
+def validar_assinatura(contrato_id: int, codigo: str, request: Request):
 
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT * FROM assinaturas 
-        WHERE inquilino_id=%s AND codigo=%s AND status='pendente'
+        SELECT * FROM assinaturas
+        WHERE contrato_id=%s AND codigo=%s AND status='pendente'
         ORDER BY id DESC LIMIT 1
-    """, (inquilino_id, codigo))
+    """, (contrato_id, codigo))
 
     assinatura = cursor.fetchone()
 
     if not assinatura:
-        raise HTTPException(400, "Código inválido")
+        return {"erro": "Código inválido"}
 
     cursor.execute("""
         UPDATE assinaturas
-        SET status='assinado', data_assinatura=%s, ip=%s
+        SET status='assinado',
+            data_assinatura=%s,
+            ip=%s
         WHERE id=%s
     """, (datetime.now(), request.client.host, assinatura["id"]))
 
@@ -242,8 +282,7 @@ def validar(inquilino_id: int, codigo: str, request: Request):
     cursor.close()
     conn.close()
 
-    return {"status": "assinado com sucesso"}
-
+    return {"status": "Contrato assinado com sucesso"}
 # ================================
 # TESTE BANCO
 # ================================
