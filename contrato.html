@@ -2,11 +2,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-
 <style>
 @page {
     size: A4;
-    margin: 2.5cm 2cm;
+    margin: margin: 2.5cm 2cm;
 }
 
 body {
@@ -16,7 +15,6 @@ body {
     color: #000;
 }
 
-/* TÍTULO */
 h1 {
     text-align: center;
     font-size: 16pt;
@@ -24,58 +22,61 @@ h1 {
     margin-bottom: 5px;
 }
 
-.subtitulo {
-    text-align: center;
-    font-size: 11pt;
-    margin-bottom: 25px;
-    border-bottom: 1px solid #000;
-    padding-bottom: 10px;
-}
-
-/* TEXTO */
 p {
     text-align: justify;
     text-indent: 1.5cm;
     margin-bottom: 12px;
 }
 
-/* CLÁUSULAS */
-ol.clausulas {
-    counter-reset: item;
-    padding-left: 0;
+.clausulas {
+    margin-left: 0;
+    padding-left: 1.25cm;
 }
 
-ol.clausulas > li {
-    margin-bottom: 12px;
+.clausulas li {
     text-align: justify;
+    margin-bottom: 10px;
 }
 
-ol.clausulas > li::marker {
-    font-weight: bold;
-}
-
-/* SUBLISTAS */
 .sublista {
-    margin-top: 8px;
-    margin-left: 1.2cm;
+    list-style-type: lower-alpha;
+    margin-left: 1cm;
 }
 
-.sublista li {
-    margin-bottom: 6px;
+.lista {
+    list-style-type: disc;
+    margin-left: 1cm;
 }
 
-/* DESTAQUE PARTES */
-.partes {
-    font-weight: bold;
+.cabecalho {
+    position: fixed;
+    top: -2cm;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 10pt;
 }
 
-/* ASSINATURA */
-.assinaturas {
+.logo {
+    position: fixed;
+    top: -2cm;
+    right: 0;
+}
+
+.marca-dagua {
+    position: fixed;
+    top: 40%;
+    left: 20%;
+    font-size: 80px;
+    color: rgba(0,0,0,0.08);
+    transform: rotate(-30deg);
+}
+
+.assinatura {
     margin-top: 80px;
     display: flex;
     justify-content: space-between;
 }
-
 .assinatura-box {
     width: 45%;
     text-align: center;
@@ -92,81 +93,119 @@ ol.clausulas > li::marker {
     text-align: center;
     font-size: 10pt;
 }
+.quebra-pagina {
+    page-break-before: always;
+}
+
 </style>
 </head>
 
 <body>
 
 <h1>CONTRATO DE LOCAÇÃO RESIDENCIAL</h1>
-<div class="subtitulo">Instrumento Particular</div>
-
+<ol class="clausulas"></ol>
+<li>
+Pelo presente instrumento particular, de um lado {{nome_locador}}, {{nacionalidade_locador}}, {{estado_civil_locador}}, {{profissao_locador}}, portador do RG nº {{rg_locador}} e CPF nº {{cpf_locador}}, residente e domiciliado na {{endereco_locador}}, doravante denominado simplesmente LOCADOR, e de outro lado {{nome_inquilino}}, {{nacionalidade_inquilino}}, {{estado_civil_inquilino}}, portador do {{documento_inquilino}} e CPF nº {{cpf_inquilino}}, residente e domiciliado na {{endereco_inquilino}}, doravante denominado simplesmente LOCATÁRIO, resolvem ajustar entre si o presente Contrato de Locação do Imóvel a seguir descrito, que se regerá pelas condições estipuladas nas seguintes cláusulas:
+</li>
+<li>
+1. O LOCADOR cede para locação residencial ao LOCATÁRIO, o imóvel situado na {{endereco_imovel}}, nº {{numero_imovel}} (UC {{uc_energia}}), bairro {{bairro}}, município de {{cidade}}/{{estado}}.
+</li>
+<li>
+2. A locação destina-se ao uso exclusivo como residência e domicílio do LOCATÁRIO.
+</li>
+<li>
+3. O LOCADOR autoriza o LOCATÁRIO e/ou o LOCADOR a transferir a titularidade da energia elétrica para o nome do inquilino durante a vigência do contrato.
+</li>
+<li>
+4. O prazo de locação é de {{prazo}} meses, iniciando-se em {{data_inicio}} e terminando em {{data_fim}}, limite de tempo em que o imóvel deverá ser restituído independentemente de qualquer notificação ou interpelação, sob pena de caracterizar infração contratual.
+</li>
+<li>
+5. O aluguel mensal será de R$ {{valor_aluguel}} e deverá ser pago até o dia {{dia_vencimento}} do mês seguinte ao vencido, no endereço do LOCADOR ou outro que venha a ser designado.
+    <ul class="sublista">
+        <li>
+            A impontualidade acarretará juros moratórios na base de {{juros}}% ao dia, calculado sobre o valor do aluguel. O atraso superior a 30 dias implicará correção monetária e encargos de cobrança correspondentes a {{multa}}% do valor corrigido.
+        </li>
+        <li>
+            O pagamento de qualquer aluguel não implica renúncia ao direito de cobrança de diferenças, encargos ou impostos não lançados.
+        </li>
+    </ul>     
+<li>
+6. O aluguel será reajustado anualmente pela variação do {{indice_reajuste}}. Havendo alteração legal, será aplicado o índice permitido pelo Governo Federal.
+</li>
+<li>
+7. Havendo prorrogação do contrato, o valor será reajustado a preço de mercado.
+</li>
+<li>
+8. Nas cobranças judiciais e extrajudiciais, os valores serão acrescidos de juros, correção monetária e honorários advocatícios de 20%.
+</li>
+<li>
+9. O imóvel destina-se exclusivamente à residência, sendo proibida a sublocação, cessão ou empréstimo sem autorização do LOCADOR.
+</li>
+<li>
+10. Além do aluguel, são responsabilidades do LOCATÁRIO:
+</li>
 <p>
-Pelo presente instrumento particular, de um lado 
-<span class="partes">{{nome_locador}}</span>, {{nacionalidade_locador}}, {{estado_civil_locador}}, {{profissao_locador}}, portador do RG nº {{rg_locador}} e CPF nº {{cpf_locador}}, residente e domiciliado na {{endereco_locador}}, doravante denominado <span class="partes">LOCADOR</span>, 
-e de outro lado 
-<span class="partes">{{nome_inquilino}}</span>, {{nacionalidade_inquilino}}, {{estado_civil_inquilino}}, portador do {{documento_inquilino}} e CPF nº {{cpf_inquilino}}, residente e domiciliado na {{endereco_inquilino}}, doravante denominado <span class="partes">LOCATÁRIO</span>, 
-resolvem celebrar o presente contrato mediante as cláusulas seguintes:
+    <ul class="sublista" >
+        <li>- Consumo de energia elétrica</li>
+        <li>- Conservação higiênica e estrutural do imóvel</li>
+        <li>- Encargos da locação</li>
+    </ul>
 </p>
-
-<ol class="clausulas">
-
-<li>O LOCADOR cede para locação residencial ao LOCATÁRIO o imóvel situado na {{endereco_imovel}}, nº {{numero_imovel}} (UC {{uc_energia}}), bairro {{bairro}}, município de {{cidade}}/{{estado}}.</li>
-
-<li>A locação destina-se exclusivamente à residência do LOCATÁRIO.</li>
-
-<li>O LOCADOR autoriza a transferência da titularidade da energia elétrica para o nome do LOCATÁRIO.</li>
-
-<li>O prazo de locação é de {{prazo}} meses, iniciando-se em {{data_inicio}} e encerrando-se em {{data_fim}}.</li>
-
-<li>O aluguel mensal será de R$ {{valor_aluguel}}, com vencimento no dia {{dia_vencimento}}.
-    <ul class="sublista">
-        <li>Juros de {{juros}}% ao dia em caso de atraso.</li>
-        <li>Multa de {{multa}}% após 30 dias.</li>
-    </ul>
+<li>
+11. O LOCATÁRIO declara conhecimento das regras abaixo e compromete-se a cumpri-las:
 </li>
-
-<li>O aluguel será reajustado pelo índice {{indice_reajuste}}.</li>
-
-<li>Nas cobranças, incidirão honorários de 20%.</li>
-
-<li>É proibida a sublocação sem autorização.</li>
-
-<li>Responsabilidades do LOCATÁRIO:
-    <ul class="sublista">
-        <li>Energia elétrica</li>
-        <li>Conservação do imóvel</li>
-        <li>Encargos da locação</li>
-    </ul>
+      <ol class="sublista">
+            <li>Manter o portão sempre fechado com cadeado</li>
+            <li>Não permitir entrada de estranhos</li>
+            <li>Colocar lixo até às 8h</li>
+            <li>Silêncio das 22h às 6h (sem ruídos ou ferramentas)</li>
+            <li>Não obstruir corredores</li>
+      </ol>
 </li>
-
-<li>O LOCATÁRIO compromete-se a:
-    <ul class="sublista">
-        <li>Manter portão fechado</li>
-        <li>Evitar entrada de estranhos</li>
-        <li>Respeitar silêncio</li>
-    </ul>
+<li>
+12. Encerrada a locação, a entrega das chaves dependerá da apresentação dos comprovantes de quitação das despesas, inclusive corte final de energia.
 </li>
-
-<li>A entrega das chaves exige quitação de débitos.</li>
-
-<li>O LOCADOR poderá vistoriar o imóvel.</li>
-
-<li>Comunicação de saída com 30 dias.</li>
-
-<li>Modificações somente com autorização.</li>
-
-<li>Multa por descumprimento: {{multa_contrato}}.</li>
-
-<li>Multa por rescisão antecipada: {{multa_rescisao}}.</li>
-
-<li>Fica eleito o foro do LOCADOR.</li>
-
+<li>
+13. Fica facultado ao LOCADOR vistoriar o imóvel sempre que necessário.
+</li>
+<li>
+14. O LOCATÁRIO deverá comunicar a desocupação com antecedência mínima de 30 dias.
+</li>
+<li>
+15. O LOCATÁRIO deverá solicitar vistoria 30 dias antes da saída.
+</li>
+<li>
+16. Qualquer modificação no imóvel só poderá ser feita com autorização do LOCADOR, não cabendo indenização por benfeitorias.
+</li>
+<li>
+17. Em caso de incêndio, danos estruturais, falência do LOCATÁRIO ou desapropriação, o contrato será rescindido sem indenização.
+</li>
+<li>
+18. A parte que infringir o contrato pagará multa equivalente a {{multa_contrato}} vezes o valor do aluguel.
+</li>
+<li>
+19. Se o LOCATÁRIO vier a usar da faculdade que lhe confere o contido no artigo 4º da Lei n º 8.245/1991 e devolver o imóvel antes do vencimento do prazo ajustado, será aplicada multa equivalente a {{multa_rescisao}} vezes o valor do aluguel vigente.
+</li>
+<li>
+20. Salvo declaração escrita do LOCADOR, quaisquer tolerância ou concessões por ela feita não implicam em renúncia de direito ou em alteração contratual, não podendo ser invocada pelo LOCATÁRIO como procedente para se furtar ao cumprimento do contrato.
+</li>
+<li>
+21. Permanecendo o LOCATÁRIO no imóvel após o prazo de desocupação voluntária nos casos de denúncia condicionada, pagará ele o aluguel pena que vier a ser arbitrado na notificação premonitória na forma de que dispõe o artigo 575 do Novo Código Civil Brasileiro, o mesmo ocorrendo no caso de mútuo acordo nos termos do artigo 9, inciso I da Lei n º 8.245/1991, quando a desocupação não se verificar na data convencionada.
+</li>
+<li>
+22. No caso do imóvel ser posto à venda, o LOCATÁRIO declara que não possui interesse em sua aquisição, renunciando expressamente ao eventual direito de preferência e autoriza desde já, a visita de interessados, em horários previamente convencionados.
+</li>
+<li>
+23. O LOCATÁRIO declara, para todos os fins e efeitos de direito, que recebe o imóvel locado em condições plenas de uso, em perfeito estado de conservação, higiene e limpeza, obrigando-se e comprometendo-se a devolvê-lo em iguais condições, independente de qualquer aviso ou notificação prévia, e qualquer que seja o motivo da devolução, sob pena de incorrer nas cominações previstas neste contrato ou estipuladas em lei, além da obrigação de indenizar por danos ou prejuízos decorrentes da inobservância desta obrigação.
+</li>
+<li>
+24. Elegem as partes o foro do domicílio do LOCADOR, para dirimir quaisquer dúvidas oriundas do presente contrato, renunciando a qualquer outro por mais privilegiado que seja. 
+</li>
 </ol>
-
 <p>
-E por estarem de pleno acordo, firmam o presente contrato.
+E por estarem de pleno acordo, assinam o presente contrato.
 </p>
-
+<li></li>
 <p>
 <strong>Local e Data:</strong> {{cidade}}, {{data_assinatura}}
 </p>
