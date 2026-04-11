@@ -154,18 +154,24 @@ def gerar_html(contrato_id: int):
     cursor.close()
     conn.close()
 
+    from jinja2 import Environment, FileSystemLoader
+    from datetime import datetime
+
     env = Environment(loader=FileSystemLoader('.'))
     template = env.get_template("contrato.html")
 
     html = template.render({
+
+        # LOCADOR
         "nome_locador": locador["nome"],
-        "cpf_locador": "00000000000",
         "nacionalidade_locador": "Brasileiro",
         "estado_civil_locador": "Solteiro",
         "profissao_locador": "Locador",
         "rg_locador": "0000000",
+        "cpf_locador": "00000000000",
         "endereco_locador": "Endereço do locador",
 
+        # INQUILINO
         "nome_inquilino": inquilino["nome"],
         "cpf_inquilino": inquilino["cpf"],
         "nacionalidade_inquilino": "Brasileiro",
@@ -173,52 +179,33 @@ def gerar_html(contrato_id: int):
         "documento_inquilino": "RG",
         "endereco_inquilino": "Endereço do inquilino",
 
+        # IMÓVEL
         "endereco_imovel": imovel["descricao"],
         "numero_imovel": imovel["numero"],
         "bairro": "Centro",
         "cidade": "Manaus",
         "estado": "AM",
-
         "uc_energia": "123456",
 
+        # CONTRATO
         "valor_aluguel": contrato["valor"],
         "dia_vencimento": contrato["vencimento_dia"],
-
         "prazo": "12",
         "data_inicio": contrato["data_inicio"],
         "data_fim": contrato["data_fim"],
 
+        # TAXAS
         "juros": "1",
         "multa": "2",
         "indice_reajuste": "IGP-M",
-        "multa_contrato": "3 meses",
-        "multa_rescisao": "2 meses",
+        "multa_contrato": "3",
+        "multa_rescisao": "2",
 
+        # DATA
         "data_assinatura": datetime.now().strftime("%d/%m/%Y")
     })
 
     return HTMLResponse(content=html)
-
-# ================================
-# GERAR CÓDIGO ASSINATURA
-# ================================
-@app.post("/assinatura/enviar")
-def enviar_codigo(inquilino_id: int):
-    codigo = str(random.randint(100000, 999999))
-
-    conn = conectar()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        INSERT INTO assinaturas (inquilino_id, codigo, status)
-        VALUES (%s, %s, 'pendente')
-    """, (inquilino_id, codigo))
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return {"codigo": codigo}  # depois troca por WhatsApp
 
 # ================================
 # VALIDAR ASSINATURA
