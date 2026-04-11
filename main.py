@@ -238,3 +238,62 @@ def debug():
         "db": os.getenv("MYSQLDATABASE"),
         "port": os.getenv("MYSQLPORT")
     }
+from jinja2 import Environment, FileSystemLoader
+import pdfkit
+
+@app.get("/contratos/pdf/{contrato_id}")
+def gerar_pdf(contrato_id: int):
+
+    conn = conectar()
+    cursor = conn.cursor(dictionary=True)
+
+    # contrato
+    cursor.execute("SELECT * FROM contratos WHERE id=%s", (contrato_id,))
+    contrato = cursor.fetchone()
+
+    if not contrato:
+        return {"erro": "Contrato não encontrado"}
+
+    # inquilino
+    cursor.execute("SELECT * FROM inquilinos WHERE id=%s", (contrato["inquilino_id"],))
+    inquilino = cursor.fetchone()
+
+    # imóvel
+    cursor.execute("SELECT * FROM imoveis WHERE id=%s", (contrato["imovel_id"],))
+    imovel = cursor.fetchone()
+
+    # locador
+    cursor.execute("SELECT * FROM usuarios LIMIT 1")
+    locador = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    # template HTML
+    env = Environment(loader=FileSystemLoader('.'))
+    template = env.get_template("contrato.html")
+
+    html = template.render({
+        "nome_locador": locador["nome"],
+        "nome_inquilino": inquilino["nome"],
+        "cpf_inquilino": inquilino["cpf"],
+        "endereco_imovel": imovel["descricao"],
+        "valor": contrato["valor"],
+        "data_inicio": contrato["data_inicio"],
+        "data_fim": contrato["data_fim"],
+        "data_hoje": datetime.now().strftime("%d/%m/%Y")
+    })
+
+    caminho_pdf = f"contrato_{contrato_id}.pdf"
+
+    config = pdfkit.configuration(
+        wkhtmltopdf=os.getenv("WKHTMLTOPDF_PATH", "/usr/bin/wkhtmltopdf")
+    )
+
+    pdfkit.from_string(html, caminho_pdf, configuration=config)
+
+    return FileResponse(
+        caminho_pdf,
+        media_type="application/pdf",
+        filename="contrato.pdf"
+    )
