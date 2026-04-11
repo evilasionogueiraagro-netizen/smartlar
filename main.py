@@ -137,31 +137,50 @@ class Contrato(BaseModel):
     data_fim: str
     vencimento_dia: int
 
-@app.post("/contratos")
-def criar_contrato(c: Contrato):
+from reportlab.platypus import SimpleDocTemplate, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from fastapi.responses import FileResponse
+
+@app.get("/contratos/pdf/{contrato_id}")
+def gerar_pdf(contrato_id: int):
+
     conn = conectar()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
 
-    # pega residencial automaticamente
-    cursor.execute("SELECT residencial_id FROM inquilinos WHERE id=%s", (c.inquilino_id,))
-    res = cursor.fetchone()
+    cursor.execute("SELECT * FROM contratos WHERE id=%s", (contrato_id,))
+    contrato = cursor.fetchone()
 
-    if not res:
-        raise HTTPException(404, "Inquilino não encontrado")
+    cursor.execute("SELECT * FROM inquilinos WHERE id=%s", (contrato["inquilino_id"],))
+    inquilino = cursor.fetchone()
 
-    residencial_id = res[0]
+    cursor.execute("SELECT * FROM imoveis WHERE id=%s", (contrato["imovel_id"],))
+    imovel = cursor.fetchone()
 
-    cursor.execute("""
-        INSERT INTO contratos 
-        (residencial_id, inquilino_id, imovel_id, valor, data_inicio, data_fim, vencimento_dia)
-        VALUES (%s,%s,%s,%s,%s,%s,%s)
-    """, (residencial_id, c.inquilino_id, c.imovel_id, c.valor, c.data_inicio, c.data_fim, c.vencimento_dia))
+    cursor.execute("SELECT * FROM usuarios LIMIT 1")
+    locador = cursor.fetchone()
 
-    conn.commit()
     cursor.close()
     conn.close()
 
-    return {"status": "contrato criado"}
+    caminho_pdf = f"contrato_{contrato_id}.pdf"
+
+    doc = SimpleDocTemplate(caminho_pdf)
+    styles = getSampleStyleSheet()
+
+    conteudo = []
+
+    conteudo.append(Paragraph("CONTRATO DE LOCAÇÃO", styles["Title"]))
+    conteudo.append(Paragraph(f"Locador: {locador['nome']}", styles["Normal"]))
+    conteudo.append(Paragraph(f"Inquilino: {inquilino['nome']}", styles["Normal"]))
+    conteudo.append(Paragraph(f"CPF: {inquilino['cpf']}", styles["Normal"]))
+    conteudo.append(Paragraph(f"Imóvel: {imovel['descricao']}", styles["Normal"]))
+    conteudo.append(Paragraph(f"Valor: R$ {contrato['valor']}", styles["Normal"]))
+    conteudo.append(Paragraph(f"Início: {contrato['data_inicio']}", styles["Normal"]))
+    conteudo.append(Paragraph(f"Fim: {contrato['data_fim']}", styles["Normal"]))
+
+    doc.build(conteudo)
+
+    return FileResponse(caminho_pdf, media_type="application/pdf", filename="contrato.pdf")
 
 # ================================
 # GERAR CÓDIGO ASSINATURA
