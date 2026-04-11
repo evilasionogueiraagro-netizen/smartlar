@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, FileResponse
+from pydantic import BaseModel
 from urllib.parse import urlparse
 import os
 import mysql.connector
