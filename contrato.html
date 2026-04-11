@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<style>
+@page {
+    size: A4;
+    margin: 2.5cm 2cm;
+}
+
+body {
+    font-family: "Times New Roman", serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    color: #000;
+}
+
+/* TÍTULO */
+h1 {
+    text-align: center;
+    font-size: 16pt;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.subtitulo {
+    text-align: center;
+    font-size: 11pt;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #000;
+    padding-bottom: 10px;
+}
+
+/* TEXTO */
+p {
+    text-align: justify;
+    text-indent: 1.5cm;
+    margin-bottom: 12px;
+}
+
+/* CLÁUSULAS */
+ol.clausulas {
+    counter-reset: item;
+    padding-left: 0;
+}
+
+ol.clausulas > li {
+    margin-bottom: 12px;
+    text-align: justify;
+}
+
+ol.clausulas > li::marker {
+    font-weight: bold;
+}
+
+/* SUBLISTAS */
+.sublista {
+    margin-top: 8px;
+    margin-left: 1.2cm;
+}
+
+.sublista li {
+    margin-bottom: 6px;
+}
+
+/* DESTAQUE PARTES */
+.partes {
+    font-weight: bold;
+}
+
+/* ASSINATURA */
+.assinaturas {
+    margin-top: 80px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.assinatura-box {
+    width: 45%;
+    text-align: center;
+}
+
+.linha {
+    margin-top: 60px;
+    border-top: 1px solid #000;
+}
+
+/* RODAPÉ */
+.rodape {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 10pt;
+}
+</style>
+</head>
+
+<body>
+
+<h1>CONTRATO DE LOCAÇÃO RESIDENCIAL</h1>
+<div class="subtitulo">Instrumento Particular</div>
+
+<p>
+Pelo presente instrumento particular, de um lado 
+<span class="partes">{{nome_locador}}</span>, {{nacionalidade_locador}}, {{estado_civil_locador}}, {{profissao_locador}}, portador do RG nº {{rg_locador}} e CPF nº {{cpf_locador}}, residente e domiciliado na {{endereco_locador}}, doravante denominado <span class="partes">LOCADOR</span>, 
+e de outro lado 
+<span class="partes">{{nome_inquilino}}</span>, {{nacionalidade_inquilino}}, {{estado_civil_inquilino}}, portador do {{documento_inquilino}} e CPF nº {{cpf_inquilino}}, residente e domiciliado na {{endereco_inquilino}}, doravante denominado <span class="partes">LOCATÁRIO</span>, 
+resolvem celebrar o presente contrato mediante as cláusulas seguintes:
+</p>
+
+<ol class="clausulas">
+
+<li>O LOCADOR cede para locação residencial ao LOCATÁRIO o imóvel situado na {{endereco_imovel}}, nº {{numero_imovel}} (UC {{uc_energia}}), bairro {{bairro}}, município de {{cidade}}/{{estado}}.</li>
+
+<li>A locação destina-se exclusivamente à residência do LOCATÁRIO.</li>
+
+<li>O LOCADOR autoriza a transferência da titularidade da energia elétrica para o nome do LOCATÁRIO.</li>
+
+<li>O prazo de locação é de {{prazo}} meses, iniciando-se em {{data_inicio}} e encerrando-se em {{data_fim}}.</li>
+
+<li>O aluguel mensal será de R$ {{valor_aluguel}}, com vencimento no dia {{dia_vencimento}}.
+    <ul class="sublista">
+        <li>Juros de {{juros}}% ao dia em caso de atraso.</li>
+        <li>Multa de {{multa}}% após 30 dias.</li>
+    </ul>
+</li>
+
+<li>O aluguel será reajustado pelo índice {{indice_reajuste}}.</li>
+
+<li>Nas cobranças, incidirão honorários de 20%.</li>
+
+<li>É proibida a sublocação sem autorização.</li>
+
+<li>Responsabilidades do LOCATÁRIO:
+    <ul class="sublista">
+        <li>Energia elétrica</li>
+        <li>Conservação do imóvel</li>
+        <li>Encargos da locação</li>
+    </ul>
+</li>
+
+<li>O LOCATÁRIO compromete-se a:
+    <ul class="sublista">
+        <li>Manter portão fechado</li>
+        <li>Evitar entrada de estranhos</li>
+        <li>Respeitar silêncio</li>
+    </ul>
+</li>
+
+<li>A entrega das chaves exige quitação de débitos.</li>
+
+<li>O LOCADOR poderá vistoriar o imóvel.</li>
+
+<li>Comunicação de saída com 30 dias.</li>
+
+<li>Modificações somente com autorização.</li>
+
+<li>Multa por descumprimento: {{multa_contrato}}.</li>
+
+<li>Multa por rescisão antecipada: {{multa_rescisao}}.</li>
+
+<li>Fica eleito o foro do LOCADOR.</li>
+
+</ol>
+
+<p>
+E por estarem de pleno acordo, firmam o presente contrato.
+</p>
+
+<p>
+<strong>Local e Data:</strong> {{cidade}}, {{data_assinatura}}
+</p>
+
+<div class="assinaturas">
+    <div class="assinatura-box">
+        <div class="linha"></div>
+        LOCADOR
+    </div>
+
+    <div class="assinatura-box">
+        <div class="linha"></div>
+        LOCATÁRIO
+    </div>
+</div>
+
+<div class="rodape">
+Contrato Digital
+</div>
+
+</body>
+</html>
