@@ -234,6 +234,9 @@ from datetime import datetime
 @app.post("/assinatura/enviar/{contrato_id}")
 def enviar_codigo(contrato_id: int):
 
+    import random
+    from datetime import datetime
+
     codigo = str(random.randint(100000, 999999))
 
     conn = conectar()
@@ -242,7 +245,10 @@ def enviar_codigo(contrato_id: int):
     cursor.execute("SELECT inquilino_id FROM contratos WHERE id=%s", (contrato_id,))
     contrato = cursor.fetchone()
 
+    # 🔥 CORREÇÃO AQUI
     if not contrato:
+        cursor.close()
+        conn.close()
         return {"erro": "Contrato não encontrado"}
 
     inquilino_id = contrato[0]
@@ -256,7 +262,10 @@ def enviar_codigo(contrato_id: int):
     cursor.close()
     conn.close()
 
-    return {"codigo": codigo}
+    return {
+        "msg": "Código gerado",
+        "codigo": codigo
+    }
 
 # ================================
 # VALIDAR ASSINATURA
