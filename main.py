@@ -129,12 +129,12 @@ def criar_imovel(im: Imovel):
 # ================================
 # CONTRATOS
 # ================================
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.units import cm
+from fastapi.responses import HTMLResponse
+from jinja2 import Environment, FileSystemLoader
+from datetime import datetime
 
-@app.get("/contratos/pdf/{contrato_id}")
-def gerar_pdf(contrato_id: int):
+@app.get("/contratos/html/{contrato_id}", response_class=HTMLResponse)
+def gerar_html(contrato_id: int):
 
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
@@ -154,48 +154,50 @@ def gerar_pdf(contrato_id: int):
     cursor.close()
     conn.close()
 
-    caminho_pdf = f"contrato_{contrato_id}.pdf"
+    env = Environment(loader=FileSystemLoader('.'))
+    template = env.get_template("contrato.html")
 
-    doc = SimpleDocTemplate(
-        caminho_pdf,
-        rightMargin=2*cm,
-        leftMargin=2*cm,
-        topMargin=2*cm,
-        bottomMargin=2*cm
-    )
+    html = template.render({
+        "nome_locador": locador["nome"],
+        "cpf_locador": "00000000000",
+        "nacionalidade_locador": "Brasileiro",
+        "estado_civil_locador": "Solteiro",
+        "profissao_locador": "Locador",
+        "rg_locador": "0000000",
+        "endereco_locador": "Endereço do locador",
 
-    styles = getSampleStyleSheet()
-    conteudo = []
+        "nome_inquilino": inquilino["nome"],
+        "cpf_inquilino": inquilino["cpf"],
+        "nacionalidade_inquilino": "Brasileiro",
+        "estado_civil_inquilino": "Solteiro",
+        "documento_inquilino": "RG",
+        "endereco_inquilino": "Endereço do inquilino",
 
-    conteudo.append(Paragraph("<b>CONTRATO DE LOCAÇÃO</b>", styles["Title"]))
-    conteudo.append(Spacer(1, 20))
+        "endereco_imovel": imovel["descricao"],
+        "numero_imovel": imovel["numero"],
+        "bairro": "Centro",
+        "cidade": "Manaus",
+        "estado": "AM",
 
-    conteudo.append(Paragraph(f"<b>LOCADOR:</b> {locador['nome']}", styles["Normal"]))
-    conteudo.append(Paragraph(f"<b>INQUILINO:</b> {inquilino['nome']}", styles["Normal"]))
-    conteudo.append(Paragraph(f"<b>CPF:</b> {inquilino['cpf']}", styles["Normal"]))
-    conteudo.append(Spacer(1, 15))
+        "uc_energia": "123456",
 
-    conteudo.append(Paragraph(f"<b>IMÓVEL:</b> {imovel['descricao']}", styles["Normal"]))
-    conteudo.append(Spacer(1, 15))
+        "valor_aluguel": contrato["valor"],
+        "dia_vencimento": contrato["vencimento_dia"],
 
-    conteudo.append(Paragraph(f"<b>VALOR:</b> R$ {contrato['valor']}", styles["Normal"]))
-    conteudo.append(Paragraph(f"<b>INÍCIO:</b> {contrato['data_inicio']}", styles["Normal"]))
-    conteudo.append(Paragraph(f"<b>FIM:</b> {contrato['data_fim']}", styles["Normal"]))
-    conteudo.append(Spacer(1, 30))
+        "prazo": "12",
+        "data_inicio": contrato["data_inicio"],
+        "data_fim": contrato["data_fim"],
 
-    conteudo.append(Paragraph("Manaus, ____/____/______", styles["Normal"]))
-    conteudo.append(Spacer(1, 40))
+        "juros": "1",
+        "multa": "2",
+        "indice_reajuste": "IGP-M",
+        "multa_contrato": "3 meses",
+        "multa_rescisao": "2 meses",
 
-    conteudo.append(Paragraph("_____________________________", styles["Normal"]))
-    conteudo.append(Paragraph("LOCADOR", styles["Normal"]))
-    conteudo.append(Spacer(1, 30))
+        "data_assinatura": datetime.now().strftime("%d/%m/%Y")
+    })
 
-    conteudo.append(Paragraph("_____________________________", styles["Normal"]))
-    conteudo.append(Paragraph("INQUILINO", styles["Normal"]))
-
-    doc.build(conteudo)
-
-    return FileResponse(caminho_pdf, media_type="application/pdf")
+    return HTMLResponse(content=html)
 
 # ================================
 # GERAR CÓDIGO ASSINATURA
