@@ -311,3 +311,15 @@ def listar_inquilinos():
     conn.close()
 
     return dados
+@app.get("/debug/contratos")
+def listar_contratos():
+    conn = conectar()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM contratos ORDER BY id DESC")
+    dados = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return dados
