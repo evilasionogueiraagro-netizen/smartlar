@@ -4,3 +4,4 @@ mysql-connector-python
 pdfkit
 jinja2
 reportlab
+qrcode[pil]
