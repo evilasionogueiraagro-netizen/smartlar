@@ -183,7 +183,14 @@ status = assinatura["status"] if assinatura else "pendente"
 data_assinatura = assinatura["data_assinatura"] if assinatura else "-"
     template = env.get_template("contrato.html")
 
-    html = template.render({
+   html = template.render({
+    "nome_locador": locador["nome"],
+    "nome_inquilino": inquilino["nome"],
+
+    # 👇 NOVO
+    "status_assinatura": status,
+    "data_assinatura": data_assinatura
+
 
         # LOCADOR
         "nome_locador": locador["nome"],
