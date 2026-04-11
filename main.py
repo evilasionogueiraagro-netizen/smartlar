@@ -157,9 +157,8 @@ def gerar_html(contrato_id: int):
         ORDER BY id DESC LIMIT 1
     """, (contrato_id,))
 
-assinatura = cursor.fetchone()
-
-status = assinatura["status"] if assinatura else "pendente"
+    assinatura = cursor.fetchone()
+    status = assinatura["status"] if assinatura else "pendente"
 
     cursor.close()
     conn.close()
