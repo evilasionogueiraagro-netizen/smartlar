@@ -157,7 +157,12 @@ def gerar_html(contrato_id: int):
     from jinja2 import Environment, FileSystemLoader
     from datetime import datetime
 
-    env = Environment(loader=FileSystemLoader('.'))
+    env = Environment(
+    loader=FileSystemLoader('.'),
+    auto_reload=True
+    )
+    env.cache = {}
+
     template = env.get_template("contrato.html")
 
     html = template.render({
