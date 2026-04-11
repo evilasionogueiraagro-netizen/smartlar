@@ -1,30 +1,14 @@
 import os
-from fastapi import FastAPI
 import mysql.connector
 
-app = FastAPI()
-
 def conectar():
-    url = os.getenv("DATABASE_URL")
-
-    if not url:
-        raise Exception("DATABASE_URL não encontrada")
-
-    url = url.replace("mysql://", "")
-
-    user_pass, host_db = url.split("@")
-    user, password = user_pass.split(":")
-    host_port, database = host_db.split("/")
-    host, port = host_port.split(":")
-
     return mysql.connector.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=database,
-        port=int(port)
+        host=os.getenv("MYSQLHOST"),
+        user=os.getenv("MYSQLUSER"),
+        password=os.getenv("MYSQLPASSWORD"),
+        database=os.getenv("MYSQLDATABASE"),
+        port=int(os.getenv("MYSQLPORT"))
     )
-
 @app.get("/")
 def home():
     return {"status": "SmartLar online 🚀"}
