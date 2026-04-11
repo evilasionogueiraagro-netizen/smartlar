@@ -1,3 +1,6 @@
+from fastapi import FastAPI
+
+app = FastAPI()
 import os
 import mysql.connector
 
