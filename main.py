@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse, FileResponse
-from pydantic import BaseModel
-import mysql.connector
+from urllib.parse import urlparse
 import os
+import mysql.connector
 from datetime import datetime
 import random
 
@@ -12,22 +12,13 @@ app = FastAPI()
 # CONEXÃO DATABASE (RAILWAY)
 # ================================
 
-from urllib.parse import urlparse
-
 def conectar():
-    url = os.getenv("DATABASE_URL")
-
-    if not url:
-        raise Exception("DATABASE_URL não encontrada")
-
-    parsed = urlparse(url)
-
     return mysql.connector.connect(
-        host=parsed.hostname,
-        user=parsed.username,
-        password=parsed.password,
-        database=parsed.path[1:],
-        port=parsed.port
+        host=os.getenv("MYSQLHOST"),
+        user=os.getenv("MYSQLUSER"),
+        password=os.getenv("MYSQLPASSWORD"),
+        database=os.getenv("MYSQLDATABASE"),
+        port=int(os.getenv("MYSQLPORT"))
     )
 
 # ================================
