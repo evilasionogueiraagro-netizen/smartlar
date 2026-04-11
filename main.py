@@ -155,9 +155,10 @@ def gerar_html(contrato_id: int):
     cursor.execute("SELECT * FROM usuarios LIMIT 1")
     locador = cursor.fetchone()
 
-    # assinatura
+    # assinatura (AGORA COM IP ✅)
     cursor.execute("""
-        SELECT status, data_assinatura FROM assinaturas
+        SELECT status, data_assinatura, ip 
+        FROM assinaturas
         WHERE contrato_id=%s
         ORDER BY id DESC LIMIT 1
     """, (contrato_id,))
@@ -166,29 +167,33 @@ def gerar_html(contrato_id: int):
 
     status = assinatura["status"] if assinatura else "pendente"
     data_assinatura = assinatura["data_assinatura"] if assinatura else "-"
+    ip_assinatura = assinatura["ip"] if assinatura else "-"
 
     cursor.close()
     conn.close()
 
     # template
-    env = Environment(
-        loader=FileSystemLoader('.'),
-        auto_reload=True
-    )
+    from jinja2 import Environment, FileSystemLoader
+    env = Environment(loader=FileSystemLoader('.'), auto_reload=True)
     env.cache = {}
 
+    # 🔥 QR CODE EM BASE64 (FUNCIONA NO HTML)
     import qrcode
+    import base64
+    from io import BytesIO
 
     url_validacao = f"https://smartlar-production.up.railway.app/validar/{contrato_id}"
 
     qr = qrcode.make(url_validacao)
-    qr_path = f"qr_{contrato_id}.png"
-    qr.save(qr_path)
+
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
 
     template = env.get_template("contrato.html")
 
-    html = template.render({ 
-        
+    html = template.render({
 
         # LOCADOR
         "nome_locador": locador["nome"],
@@ -231,9 +236,11 @@ def gerar_html(contrato_id: int):
 
         # ASSINATURA
         "status_assinatura": status,
-        "data_assinatura": data_assinatura
-        "qr_code": qr_path,
-        "ip_assinatura": assinatura["ip"] if assinatura else "-"
+        "data_assinatura": data_assinatura,
+        "ip_assinatura": ip_assinatura,
+
+        # QR CODE
+        "qr_code": qr_base64
     })
 
     return HTMLResponse(content=html)
