@@ -177,6 +177,14 @@ def gerar_html(contrato_id: int):
     )
     env.cache = {}
 
+    import qrcode
+
+    url_validacao = f"https://smartlar-production.up.railway.app/validar/{contrato_id}"
+
+    qr = qrcode.make(url_validacao)
+    qr_path = f"qr_{contrato_id}.png"
+    qr.save(qr_path)
+
     template = env.get_template("contrato.html")
 
     html = template.render({
@@ -306,6 +314,35 @@ def validar_assinatura(contrato_id: int, codigo: str, request: Request):
     conn.close()
 
     return {"status": "Contrato assinado com sucesso"}
+@app.get("/validar/{contrato_id}")
+def validar_contrato(contrato_id: int):
+
+    conn = conectar()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT a.status, a.data_assinatura, a.ip, i.nome
+        FROM assinaturas a
+        JOIN inquilinos i ON a.inquilino_id = i.id
+        WHERE a.contrato_id=%s
+        ORDER BY a.id DESC LIMIT 1
+    """, (contrato_id,))
+
+    assinatura = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not assinatura:
+        return {"status": "Contrato não encontrado"}
+
+    return {
+        "contrato": contrato_id,
+        "inquilino": assinatura["nome"],
+        "status": assinatura["status"],
+        "data": assinatura["data_assinatura"],
+        "ip": assinatura["ip"]
+    }
 # ================================
 # TESTE BANCO
 # ================================
