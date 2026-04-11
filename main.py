@@ -129,18 +129,6 @@ def criar_imovel(im: Imovel):
 # ================================
 # CONTRATOS
 # ================================
-class Contrato(BaseModel):
-    inquilino_id: int
-    imovel_id: int
-    valor: float
-    data_inicio: str
-    data_fim: str
-    vencimento_dia: int
-
-from reportlab.platypus import SimpleDocTemplate, Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
-from fastapi.responses import FileResponse
-
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import cm
