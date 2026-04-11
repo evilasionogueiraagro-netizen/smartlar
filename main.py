@@ -11,13 +11,23 @@ app = FastAPI()
 # ================================
 # CONEXÃO DATABASE (RAILWAY)
 # ================================
+
+from urllib.parse import urlparse
+
 def conectar():
+    url = os.getenv("DATABASE_URL")
+
+    if not url:
+        raise Exception("DATABASE_URL não encontrada")
+
+    parsed = urlparse(url)
+
     return mysql.connector.connect(
-        host=os.getenv("MYSQLHOST"),
-        user=os.getenv("MYSQLUSER"),
-        password=os.getenv("MYSQLPASSWORD"),
-        database=os.getenv("MYSQLDATABASE"),
-        port=int(os.getenv("MYSQLPORT"))
+        host=parsed.hostname,
+        user=parsed.username,
+        password=parsed.password,
+        database=parsed.path[1:],
+        port=parsed.port
     )
 
 # ================================
@@ -297,3 +307,15 @@ def gerar_pdf(contrato_id: int):
         media_type="application/pdf",
         filename="contrato.pdf"
     )
+@app.get("/debug/inquilinos")
+def listar_inquilinos():
+    conn = conectar()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM inquilinos")
+    dados = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return dados
