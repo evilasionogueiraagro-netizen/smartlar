@@ -254,7 +254,7 @@ def enviar_codigo(contrato_id: int):
     inquilino_id = contrato[0]
 
     cursor.execute("""
-        INSERT INTO assinaturas (contrato_id, inquilino_id, codigo, data_envio)
+        INSERT INTO assinaturas (contrato_id, inquilino_id, codigo, criado_em)
         VALUES (%s, %s, %s, %s)
     """, (contrato_id, inquilino_id, codigo, datetime.now()))
 
