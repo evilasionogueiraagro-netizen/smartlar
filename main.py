@@ -139,58 +139,47 @@ def gerar_html(contrato_id: int):
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
 
+    # contrato
     cursor.execute("SELECT * FROM contratos WHERE id=%s", (contrato_id,))
     contrato = cursor.fetchone()
 
+    # inquilino
     cursor.execute("SELECT * FROM inquilinos WHERE id=%s", (contrato["inquilino_id"],))
     inquilino = cursor.fetchone()
 
+    # imóvel
     cursor.execute("SELECT * FROM imoveis WHERE id=%s", (contrato["imovel_id"],))
     imovel = cursor.fetchone()
 
+    # locador
     cursor.execute("SELECT * FROM usuarios LIMIT 1")
     locador = cursor.fetchone()
 
+    # assinatura
     cursor.execute("""
-        SELECT status FROM assinaturas 
-        WHERE contrato_id=%s 
+        SELECT status, data_assinatura FROM assinaturas
+        WHERE contrato_id=%s
         ORDER BY id DESC LIMIT 1
     """, (contrato_id,))
-
+    
     assinatura = cursor.fetchone()
+
     status = assinatura["status"] if assinatura else "pendente"
+    data_assinatura = assinatura["data_assinatura"] if assinatura else "-"
 
     cursor.close()
     conn.close()
 
-    from jinja2 import Environment, FileSystemLoader
-    from datetime import datetime
-
+    # template
     env = Environment(
-    loader=FileSystemLoader('.'),
-    auto_reload=True
+        loader=FileSystemLoader('.'),
+        auto_reload=True
     )
     env.cache = {}
-    cursor.execute("""
-SELECT status, data_assinatura FROM assinaturas
-WHERE contrato_id=%s
-ORDER BY id DESC LIMIT 1
-""", (contrato_id,))
 
-assinatura = cursor.fetchone()
-
-status = assinatura["status"] if assinatura else "pendente"
-data_assinatura = assinatura["data_assinatura"] if assinatura else "-"
     template = env.get_template("contrato.html")
 
-   html = template.render({
-    "nome_locador": locador["nome"],
-    "nome_inquilino": inquilino["nome"],
-
-    # 👇 NOVO
-    "status_assinatura": status,
-    "data_assinatura": data_assinatura
-
+    html = template.render({
 
         # LOCADOR
         "nome_locador": locador["nome"],
@@ -231,8 +220,9 @@ data_assinatura = assinatura["data_assinatura"] if assinatura else "-"
         "multa_contrato": "3",
         "multa_rescisao": "2",
 
-        # DATA
-        "data_assinatura": datetime.now().strftime("%d/%m/%Y")
+        # ASSINATURA
+        "status_assinatura": status,
+        "data_assinatura": data_assinatura
     })
 
     return HTMLResponse(content=html)
