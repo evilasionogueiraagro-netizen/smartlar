@@ -227,6 +227,10 @@ def gerar_html(contrato_id: int):
 import random
 from datetime import datetime
 
+from fastapi import Request
+import random
+from datetime import datetime
+
 @app.post("/assinatura/enviar/{contrato_id}")
 def enviar_codigo(contrato_id: int):
 
@@ -235,7 +239,6 @@ def enviar_codigo(contrato_id: int):
     conn = conectar()
     cursor = conn.cursor()
 
-    # pega inquilino do contrato
     cursor.execute("SELECT inquilino_id FROM contratos WHERE id=%s", (contrato_id,))
     contrato = cursor.fetchone()
 
@@ -253,15 +256,11 @@ def enviar_codigo(contrato_id: int):
     cursor.close()
     conn.close()
 
-    return {
-        "msg": "Código gerado",
-        "codigo": codigo  # depois trocamos por WhatsApp
-    }
+    return {"codigo": codigo}
+
 # ================================
 # VALIDAR ASSINATURA
 # ================================
-from fastapi import Request
-
 @app.post("/assinatura/validar")
 def validar_assinatura(contrato_id: int, codigo: str, request: Request):
 
