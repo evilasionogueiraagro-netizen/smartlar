@@ -21,7 +21,8 @@ def enviar_whatsapp(numero, mensagem):
 
     try:
         response = requests.post(url, json=payload, timeout=5)
-        print("ZAPI:", response.text)
+        print("ZAPI STATUS:", response.status_code)
+        print("ZAPI RESPOSTA:", response.text)
     except Exception as e:
         print("ERRO WHATSAPP:", e)
 
