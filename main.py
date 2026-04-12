@@ -325,6 +325,13 @@ def validar_assinatura(contrato_id: int, codigo: str, request: Request):
             ip=%s
         WHERE id=%s
     """, (datetime.now(), ip, assinatura["id"]))
+    html_final = gerar_html(contrato_id).body.decode()
+
+    cursor.execute("""
+        UPDATE contratos 
+        SET html_contrato=%s 
+        WHERE id=%s
+    """, (html_final, contrato_id))
 
     conn.commit()
     cursor.close()
