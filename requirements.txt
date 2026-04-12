@@ -1,8 +1,9 @@
 fastapi
 uvicorn
 mysql-connector-python
-pdfkit
+python-dotenv
 jinja2
-reportlab
-qrcode[pil]
+pdfkit
 requests
+pyjwt
+qrcode

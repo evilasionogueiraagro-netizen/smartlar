@@ -1,3 +1,16 @@
-ZAPI_INSTANCE = "3F1847ADAFDE21F3ABE79ED390C0144C"
-ZAPI_TOKEN = "C619984FEC04E144B8F2E9C2"
-ZAPI_CLIENT = "F197903852ddf43358ce450b7eea92399S"
+import os
+
+class Settings:
+    DB_HOST = os.getenv("MYSQLHOST")
+    DB_USER = os.getenv("MYSQLUSER")
+    DB_PASS = os.getenv("MYSQLPASSWORD")
+    DB_NAME = os.getenv("MYSQLDATABASE")
+    DB_PORT = int(os.getenv("MYSQLPORT", 3306))
+
+    ZAPI_INSTANCE = os.getenv("ZAPI_INSTANCE")
+    ZAPI_TOKEN = os.getenv("ZAPI_TOKEN")
+    ZAPI_CLIENT = os.getenv("ZAPI_CLIENT")
+
+    SECRET_KEY = os.getenv("SECRET_KEY", "super-secret")
+
+settings = Settings()

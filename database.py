@@ -1,11 +1,15 @@
-import os
-import mysql.connector
+import mysql.connector.pooling
+from app.core.config import settings
 
-def conectar():
-    return mysql.connector.connect(
-        host=os.getenv("MYSQLHOST"),
-        user=os.getenv("MYSQLUSER"),
-        password=os.getenv("MYSQLPASSWORD"),
-        database=os.getenv("MYSQLDATABASE"),
-        port=int(os.getenv("MYSQLPORT"))
-    )
+pool = mysql.connector.pooling.MySQLConnectionPool(
+    pool_name="smartlar_pool",
+    pool_size=5,
+    host=settings.DB_HOST,
+    user=settings.DB_USER,
+    password=settings.DB_PASS,
+    database=settings.DB_NAME,
+    port=settings.DB_PORT
+)
+
+def get_conn():
+    return pool.get_connection()
