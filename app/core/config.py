@@ -1,10 +1,10 @@
 import os
 
 class Settings:
-    DB_HOST = os.getenv("${{MySQL.MYSQLHOST}}")
-    DB_USER = os.getenv("${{MySQL.MYSQLUSER}}")
-    DB_PASS = os.getenv("${{MySQL.MYSQLPASSWORD}}")
-    DB_NAME = os.getenv("${{MySQL.MYSQLDATABASE}}")
+    DB_HOST = os.getenv("mysql.railway.internal")
+    DB_USER = os.getenv("root")
+    DB_PASS = os.getenv("SVYTByDzVrvqBsrfkEaMpyXnUFzpkzKx")
+    DB_NAME = os.getenv("railway")
     DB_PORT = int(os.getenv("${{MySQL.MYSQLPORT}}", 3306))
 
     ZAPI_INSTANCE = os.getenv("3F1847ADAFDE21F3ABE79ED390C0144C")
