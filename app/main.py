@@ -1,14 +1,16 @@
 from fastapi import FastAPI
+from fastapi import APIRouter
+
+
 from app.routes import assinatura
 from app.db.database import get_conn
-from fastapi import FastAPI
-
 from app.routes import usuarios
 from app.routes import inquilinos
 from app.routes import imoveis
 from app.routes import contratos
 from app.routes import assinatura
 from app.routes import residencial
+router = APIRouter()
 
 app = FastAPI()
 
