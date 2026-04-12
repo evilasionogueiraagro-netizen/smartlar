@@ -276,16 +276,17 @@ from datetime import datetime
 @app.post("/assinatura/enviar/{contrato_id}")
 def enviar_codigo(contrato_id: int):
 
-    import random
     from datetime import datetime
+    import random
 
     codigo = str(random.randint(100000, 999999))
 
-    conn = conectar()
-    cursor = conn.cursor()
+    cursor.execute("""
+    INSERT INTO assinaturas (contrato_id, inquilino_id, codigo, status)
+    VALUES (%s, %s, %s, 'pendente')
+    """, (contrato_id, inquilino_id, codigo))
 
-    cursor.execute("SELECT inquilino_id FROM contratos WHERE id=%s", (contrato_id,))
-    contrato = cursor.fetchone()
+    conn.commit()
 
     # 🔥 CORREÇÃO AQUI
     if not contrato:
