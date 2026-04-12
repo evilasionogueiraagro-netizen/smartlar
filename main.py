@@ -282,11 +282,8 @@ def enviar_codigo(contrato_id: int):
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
 
-    # 🔍 buscar inquilino do contrato
-    cursor.execute("""
-    SELECT inquilino_id FROM contratos WHERE id=%s
-    """, (contrato_id,))
-    
+    # 🔍 contrato
+    cursor.execute("SELECT inquilino_id FROM contratos WHERE id=%s", (contrato_id,))
     contrato = cursor.fetchone()
 
     if not contrato:
@@ -294,22 +291,19 @@ def enviar_codigo(contrato_id: int):
 
     inquilino_id = contrato["inquilino_id"]
 
-    # 🔐 gerar código
+    # 🔐 código
     codigo = str(random.randint(100000, 999999))
 
-    # 💾 salvar código
+    # 💾 salvar
     cursor.execute("""
-    INSERT INTO assinaturas (contrato_id, inquilino_id, codigo, status)
-    VALUES (%s, %s, %s, 'pendente')
+        INSERT INTO assinaturas (contrato_id, inquilino_id, codigo, status)
+        VALUES (%s, %s, %s, 'pendente')
     """, (contrato_id, inquilino_id, codigo))
 
     conn.commit()
 
-    # 📲 buscar telefone
-    cursor.execute("""
-    SELECT telefone FROM inquilinos WHERE id=%s
-    """, (inquilino_id,))
-
+    # 📲 telefone
+    cursor.execute("SELECT telefone FROM inquilinos WHERE id=%s", (inquilino_id,))
     tel = cursor.fetchone()
 
     if not tel:
@@ -317,7 +311,7 @@ def enviar_codigo(contrato_id: int):
 
     telefone = tel["telefone"]
 
-    # 📲 enviar whatsapp
+    # 📲 whatsapp
     mensagem = f"""
 📄 SmartLar
 
@@ -331,44 +325,7 @@ Seu código de assinatura é:
     cursor.close()
     conn.close()
 
-    return {"status": "Código enviado com sucesso"}
-
-    # 🔥 CORREÇÃO AQUI
-    if not contrato:
-        cursor.close()
-        conn.close()
-        return {"erro": "Contrato não encontrado"}
-
-    inquilino_id = contrato[0]
-
-    cursor.execute("""
-        INSERT INTO assinaturas (contrato_id, inquilino_id, codigo, criado_em)
-        VALUES (%s, %s, %s, %s)
-    """, (contrato_id, inquilino_id, codigo, datetime.now()))
-    # buscar telefone do inquilino
-    cursor.execute("SELECT telefone FROM inquilinos WHERE id=%s", (inquilino_id,))
-    telefone = cursor.fetchone()["telefone"]
-
-    mensagem = f"""
-    📄 SmartLar
-
-    Seu código de assinatura é:
-
-    🔐 {codigo}
-
-    Use para assinar seu contrato.
-    """
-
-    enviar_whatsapp(telefone, mensagem)
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return {
-        "msg": "Código gerado",
-        "codigo": codigo
-    }
+    return {"status": "Código enviado"}
 
 # ================================
 # VALIDAR ASSINATURA
