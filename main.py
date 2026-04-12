@@ -182,7 +182,7 @@ def gerar_html(contrato_id: int):
     import base64
     from io import BytesIO
 
-    url_validacao = f"https://smartlar-production.up.railway.app/validar/{contrato_id}"
+    url_validacao = f"https://smartlar-production.up.railway.app/contratos/html/{contrato_id}"
 
     qr = qrcode.make(url_validacao)
 
