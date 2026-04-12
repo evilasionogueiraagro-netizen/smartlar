@@ -9,15 +9,25 @@ app.include_router(assinatura.router)
 @app.get("/")
 def home():
     return {"status": "SmartLar online 🚀"}
+
+# 🔥 DEBUG BANCO
 @app.get("/debug/contratos")
 def listar():
-    conn = get_conn()
-    cursor = conn.cursor(dictionary=True)
+    try:
+        conn = get_conn()
+        cursor = conn.cursor(dictionary=True)
 
-    cursor.execute("SELECT * FROM contratos")
-    dados = cursor.fetchall()
+        cursor.execute("SELECT * FROM contratos")
+        dados = cursor.fetchall()
 
-    cursor.close()
-    conn.close()
+        return dados
 
-    return dados
+    except Exception as e:
+        return {"erro_real": str(e)}
+
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except:
+            pass
