@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.routes import assinatura
+from app.db.database import get_conn
 
 app = FastAPI()
 
