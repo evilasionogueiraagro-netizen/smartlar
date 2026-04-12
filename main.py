@@ -257,11 +257,7 @@ def gerar_html(contrato_id: int):
         "qr_code": qr_base64
     })
 
-    cursor.execute("SELECT html_contrato FROM contratos WHERE id=%s", (contrato_id,))
-c = cursor.fetchone()
 
-if c and c["html_contrato"]:
-    return HTMLResponse(content=c["html_contrato"])
 
 # ================================
 # ENVIAR CONTRATO
@@ -387,13 +383,7 @@ def validar_contrato(contrato_id: int):
         ORDER BY a.id DESC LIMIT 1
     """, (contrato_id,))
     
-    cursor.execute("""
-    UPDATE contratos 
-    SET html_contrato=%s 
-    WHERE id=%s
-    """, (html, contrato_id))
-    assinatura = cursor.fetchone()
-
+    
     cursor.close()
     conn.close()
 
