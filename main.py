@@ -8,16 +8,22 @@ from datetime import datetime
 import random
 import requests
 
-ZAPI_INSTANCE = "3F1847ADAFDE21F3ABE79ED390C0144C"
-ZAPI_TOKEN = "F197903852ddf43358ce450b7eea92399S"
+ZAPI_INSTANCE = "3F13D80B3445511236894AC8C214C6FF"
+ZAPI_TOKEN = "BA35571E4090BA13158B3B08"
+ZAPI_CLIENT = "F197903852ddf43358ce450b7eea92399S"
 
-def enviar_whatsapp(numero, mensagem):
+def enviar_whatsapp(numero, msg):
     url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-text"
 
-    payload = {
-        "phone": numero,
-        "message": mensagem
+    headers = {
+        "Client-Token": ZAPI_CLIENT,
+        "Content-Type": "application/json"
     }
+
+    requests.post(url, json={
+        "phone": numero,
+        "message": msg
+    }, headers=headers)
 
     try:
         response = requests.post(url, json=payload, timeout=5)
