@@ -5,3 +5,4 @@ pdfkit
 jinja2
 reportlab
 qrcode[pil]
+requests
