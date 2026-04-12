@@ -19,7 +19,8 @@ def enviar_whatsapp(numero, mensagem):
         "message": mensagem
     }
 
-    requests.post(url, json=payload)
+    response = requests.post(url, json=payload)
+print("ZAPI:", response.text)
 
 app = FastAPI()
 
