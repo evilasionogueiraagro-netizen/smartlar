@@ -9,7 +9,7 @@ import random
 import requests
 
 ZAPI_INSTANCE = "3F1847ADAFDE21F3ABE79ED390C0144C"
-ZAPI_TOKEN = "C619984FEC04E144B8F2E9C2"
+ZAPI_TOKEN = "F197903852ddf43358ce450b7eea92399S"
 
 def enviar_whatsapp(numero, mensagem):
     url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-text"
