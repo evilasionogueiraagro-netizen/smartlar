@@ -182,7 +182,7 @@ def gerar_html(contrato_id: int):
     import base64
     from io import BytesIO
 
-    url_validacao = f"https://smartlar-production.up.railway.app/contratos/html/{contrato_id}"
+    url_validacao = f"https://smartlar-production.up.railway.app/contratos/visualizar/{contrato_id}"
 
     qr = qrcode.make(url_validacao)
 
@@ -474,3 +474,21 @@ def listar_contratos():
     conn.close()
 
     return dados
+from fastapi.responses import HTMLResponse
+
+@app.get("/contratos/visualizar/{contrato_id}", response_class=HTMLResponse)
+def visualizar_contrato(contrato_id: int):
+
+    conn = conectar()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("SELECT html_contrato FROM contratos WHERE id=%s", (contrato_id,))
+    contrato = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not contrato or not contrato["html_contrato"]:
+        return "Contrato não encontrado"
+
+    return HTMLResponse(content=contrato["html_contrato"])
