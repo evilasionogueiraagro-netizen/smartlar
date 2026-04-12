@@ -14,7 +14,8 @@ def get_conn():
             user=settings.DB_USER,
             password=settings.DB_PASS,
             database=settings.DB_NAME,
-            port=settings.DB_PORT
+            port=int(settings.DB_PORT),
+            ssl_disabled=False  # 🔥 IMPORTANTE
         )
 
     return pool.get_connection()
