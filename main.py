@@ -294,8 +294,12 @@ def enviar_codigo(contrato_id: int):
 # ================================
 # VALIDAR ASSINATURA
 # ================================
+from fastapi import Request
+
 @app.post("/assinatura/validar")
 def validar_assinatura(contrato_id: int, codigo: str, request: Request):
+
+    from datetime import datetime
 
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
@@ -311,13 +315,16 @@ def validar_assinatura(contrato_id: int, codigo: str, request: Request):
     if not assinatura:
         return {"erro": "Código inválido"}
 
+    # 🔥 AQUI ESTÁ O IP
+    ip = request.client.host
+
     cursor.execute("""
         UPDATE assinaturas
         SET status='assinado',
             data_assinatura=%s,
             ip=%s
         WHERE id=%s
-    """, (datetime.now(), request.client.host, assinatura["id"]))
+    """, (datetime.now(), ip, assinatura["id"]))
 
     conn.commit()
     cursor.close()
