@@ -347,7 +347,7 @@ Seu código de assinatura é:
     """, (contrato_id, inquilino_id, codigo, datetime.now()))
     # buscar telefone do inquilino
     cursor.execute("SELECT telefone FROM inquilinos WHERE id=%s", (inquilino_id,))
-    telefone = cursor.fetchone()[0]
+    telefone = cursor.fetchone()["telefone"]
 
     mensagem = f"""
     📄 SmartLar
