@@ -31,3 +31,9 @@ def listar():
             conn.close()
         except:
             pass
+@app.get("/debug/env")
+def debug_env():
+    import os
+    return {
+        "host": os.getenv("MYSQLHOST"),
+    }
