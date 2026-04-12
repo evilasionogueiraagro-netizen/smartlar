@@ -6,6 +6,20 @@ import os
 import mysql.connector
 from datetime import datetime
 import random
+import requests
+
+ZAPI_INSTANCE = "3F1847ADAFDE21F3ABE79ED390C0144C"
+ZAPI_TOKEN = "C619984FEC04E144B8F2E9C2"
+
+def enviar_whatsapp(numero, mensagem):
+    url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-text"
+
+    payload = {
+        "phone": numero,
+        "message": mensagem
+    }
+
+    requests.post(url, json=payload)
 
 app = FastAPI()
 
@@ -243,7 +257,11 @@ def gerar_html(contrato_id: int):
         "qr_code": qr_base64
     })
 
-    return HTMLResponse(content=html)
+    cursor.execute("SELECT html_contrato FROM contratos WHERE id=%s", (contrato_id,))
+c = cursor.fetchone()
+
+if c and c["html_contrato"]:
+    return HTMLResponse(content=c["html_contrato"])
 
 # ================================
 # ENVIAR CONTRATO
@@ -281,6 +299,21 @@ def enviar_codigo(contrato_id: int):
         INSERT INTO assinaturas (contrato_id, inquilino_id, codigo, criado_em)
         VALUES (%s, %s, %s, %s)
     """, (contrato_id, inquilino_id, codigo, datetime.now()))
+    # buscar telefone do inquilino
+    cursor.execute("SELECT telefone FROM inquilinos WHERE id=%s", (inquilino_id,))
+    telefone = cursor.fetchone()[0]
+
+    mensagem = f"""
+    📄 SmartLar
+
+    Seu código de assinatura é:
+
+    🔐 {codigo}
+
+    Use para assinar seu contrato.
+    """
+
+    enviar_whatsapp(telefone, mensagem)
 
     conn.commit()
     cursor.close()
@@ -325,14 +358,16 @@ def validar_assinatura(contrato_id: int, codigo: str, request: Request):
             ip=%s
         WHERE id=%s
     """, (datetime.now(), ip, assinatura["id"]))
+    
     html_final = gerar_html(contrato_id).body.decode()
 
     cursor.execute("""
-        UPDATE contratos 
-        SET html_contrato=%s 
-        WHERE id=%s
+    UPDATE contratos 
+    SET html_contrato=%s 
+    WHERE id=%s
     """, (html_final, contrato_id))
 
+    
     conn.commit()
     cursor.close()
     conn.close()
@@ -457,6 +492,17 @@ def gerar_pdf(contrato_id: int):
         media_type="application/pdf",
         filename="contrato.pdf"
     )
+def enviar_pdf_whatsapp(numero, url_pdf):
+
+    url = f"https://api.z-api.io/instances/{ZAPI_INSTANCE}/token/{ZAPI_TOKEN}/send-document"
+
+    payload = {
+        "phone": numero,
+        "document": url_pdf,
+        "fileName": "contrato.pdf"
+    }
+
+    requests.post(url, json=payload)
 @app.get("/debug/inquilinos")
 def listar_inquilinos():
     conn = conectar()
@@ -483,15 +529,40 @@ def listar_contratos():
     return dados
 from fastapi.responses import HTMLResponse
 
+from datetime import datetime
+
+
+
 @app.get("/contratos/visualizar/{contrato_id}", response_class=HTMLResponse)
-def visualizar_contrato(contrato_id: int):
+def visualizar_contrato(contrato_id: int, request: Request):
 
     conn = conectar()
     cursor = conn.cursor(dictionary=True)
 
+    # 🔍 pegar contrato
+    cursor.execute("SELECT inquilino_id FROM contratos WHERE id=%s", (contrato_id,))
+    c = cursor.fetchone()
+
+    if not c:
+        return "Contrato não encontrado"
+
+    # 🔥 LOG DE ACESSO
+    cursor.execute("""
+        INSERT INTO logs_acesso (dispositivo_id, inquilino_id, data, tipo, sucesso)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (
+        request.client.host,   # IP
+        c["inquilino_id"],     # dono
+        datetime.now(),
+        "visualizacao",
+        1
+    ))
+
+    # 🔍 pegar HTML
     cursor.execute("SELECT html_contrato FROM contratos WHERE id=%s", (contrato_id,))
     contrato = cursor.fetchone()
 
+    conn.commit()
     cursor.close()
     conn.close()
 
@@ -499,3 +570,7 @@ def visualizar_contrato(contrato_id: int):
         return "Contrato não encontrado"
 
     return HTMLResponse(content=contrato["html_contrato"])
+@app.get("/teste-whatsapp")
+def teste_whatsapp():
+    enviar_whatsapp("5597984360147", "Teste SmartLar 🚀")
+    return {"ok": True}
