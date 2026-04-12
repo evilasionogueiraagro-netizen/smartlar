@@ -276,17 +276,62 @@ from datetime import datetime
 @app.post("/assinatura/enviar/{contrato_id}")
 def enviar_codigo(contrato_id: int):
 
-    from datetime import datetime
     import random
+    from datetime import datetime
 
+    conn = conectar()
+    cursor = conn.cursor(dictionary=True)
+
+    # 🔍 buscar inquilino do contrato
+    cursor.execute("""
+    SELECT inquilino_id FROM contratos WHERE id=%s
+    """, (contrato_id,))
+    
+    contrato = cursor.fetchone()
+
+    if not contrato:
+        return {"erro": "Contrato não encontrado"}
+
+    inquilino_id = contrato["inquilino_id"]
+
+    # 🔐 gerar código
     codigo = str(random.randint(100000, 999999))
 
+    # 💾 salvar código
     cursor.execute("""
     INSERT INTO assinaturas (contrato_id, inquilino_id, codigo, status)
     VALUES (%s, %s, %s, 'pendente')
     """, (contrato_id, inquilino_id, codigo))
 
     conn.commit()
+
+    # 📲 buscar telefone
+    cursor.execute("""
+    SELECT telefone FROM inquilinos WHERE id=%s
+    """, (inquilino_id,))
+
+    tel = cursor.fetchone()
+
+    if not tel:
+        return {"erro": "Telefone não encontrado"}
+
+    telefone = tel["telefone"]
+
+    # 📲 enviar whatsapp
+    mensagem = f"""
+📄 SmartLar
+
+Seu código de assinatura é:
+
+🔐 {codigo}
+"""
+
+    enviar_whatsapp(telefone, mensagem)
+
+    cursor.close()
+    conn.close()
+
+    return {"status": "Código enviado com sucesso"}
 
     # 🔥 CORREÇÃO AQUI
     if not contrato:
