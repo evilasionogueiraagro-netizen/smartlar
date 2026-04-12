@@ -563,5 +563,5 @@ def visualizar_contrato(contrato_id: int, request: Request):
     return HTMLResponse(content=contrato["html_contrato"])
 @app.get("/teste-whatsapp")
 def teste_whatsapp():
-    enviar_whatsapp("5597984360147", "Teste SmartLar 🚀")
+    enviar_whatsapp("5592981230802", "Teste SmartLar 🚀")
     return {"ok": True}
