@@ -344,7 +344,12 @@ def validar_contrato(contrato_id: int):
         WHERE a.contrato_id=%s
         ORDER BY a.id DESC LIMIT 1
     """, (contrato_id,))
-
+    
+    cursor.execute("""
+    UPDATE contratos 
+    SET html_contrato=%s 
+    WHERE id=%s
+    """, (html, contrato_id))
     assinatura = cursor.fetchone()
 
     cursor.close()
