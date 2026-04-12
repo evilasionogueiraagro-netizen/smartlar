@@ -157,17 +157,17 @@ def gerar_html(contrato_id: int):
 
     # assinatura (AGORA COM IP ✅)
     cursor.execute("""
-        SELECT status, data_assinatura, ip 
-        FROM assinaturas
-        WHERE contrato_id=%s
-        ORDER BY id DESC LIMIT 1
-    """, (contrato_id,))
+    SELECT status, data_assinatura, ip 
+    FROM assinaturas
+    WHERE contrato_id=%s
+    ORDER BY id DESC LIMIT 1
+""", (contrato_id,))
     
     assinatura = cursor.fetchone()
 
     status = assinatura["status"] if assinatura else "pendente"
     data_assinatura = assinatura["data_assinatura"] if assinatura else "-"
-    ip_assinatura = assinatura["ip"] if assinatura else "-"
+    ip_assinatura = assinatura["ip"] if assinatura and assinatura["ip"] else "-"
 
     cursor.close()
     conn.close()
@@ -189,7 +189,7 @@ def gerar_html(contrato_id: int):
     buffer = BytesIO()
     qr.save(buffer, format="PNG")
 
-    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
     template = env.get_template("contrato.html")
 
