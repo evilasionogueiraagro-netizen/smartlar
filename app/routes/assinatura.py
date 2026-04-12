@@ -8,37 +8,51 @@ router = APIRouter()
 @router.post("/assinatura/enviar/{contrato_id}")
 def enviar_codigo(contrato_id: int):
 
-    conn = get_conn()
-    cursor = conn.cursor(dictionary=True)
+    try:
+        conn = get_conn()
+        cursor = conn.cursor(dictionary=True)
 
-    # contrato
-    cursor.execute("SELECT inquilino_id FROM contratos WHERE id=%s", (contrato_id,))
-    contrato = cursor.fetchone()
+        # contrato
+        cursor.execute("SELECT inquilino_id FROM contratos WHERE id=%s", (contrato_id,))
+        contrato = cursor.fetchone()
 
-    if not contrato:
-        return {"erro": "Contrato não encontrado"}
+        if not contrato:
+            return {"erro": "Contrato não encontrado"}
 
-    # código
-    codigo = str(random.randint(100000, 999999))
+        inquilino_id = contrato.get("inquilino_id")
 
-    # salva (CORRETO com seu banco)
-    cursor.execute("""
-        INSERT INTO assinaturas (contrato_id, codigo_verificacao, status)
-        VALUES (%s, %s, 'pendente')
-    """, (contrato_id, codigo))
+        if not inquilino_id:
+            return {"erro": "Contrato sem inquilino"}
 
-    # telefone
-    cursor.execute("SELECT telefone FROM inquilinos WHERE id=%s", (contrato["inquilino_id"],))
-    tel = cursor.fetchone()
+        # telefone
+        cursor.execute("SELECT telefone FROM inquilinos WHERE id=%s", (inquilino_id,))
+        tel = cursor.fetchone()
 
-    if not tel:
-        return {"erro": "Telefone não encontrado"}
+        if not tel or not tel.get("telefone"):
+            return {"erro": "Telefone não encontrado"}
 
-    # envia
-    enviar_whatsapp(tel["telefone"], f"🔐 Código SmartLar: {codigo}")
+        telefone = tel["telefone"]
 
-    conn.commit()
-    cursor.close()
-    conn.close()
+        # código
+        codigo = str(random.randint(100000, 999999))
 
-    return {"status": "Código enviado"}
+        cursor.execute("""
+            INSERT INTO assinaturas (contrato_id, codigo_verificacao, status)
+            VALUES (%s, %s, 'pendente')
+        """, (contrato_id, codigo))
+
+        conn.commit()
+
+        enviar_whatsapp(telefone, f"🔐 Código SmartLar: {codigo}")
+
+        return {"status": "Código enviado"}
+
+    except Exception as e:
+        return {"erro_real": str(e)}
+
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except:
+            pass
