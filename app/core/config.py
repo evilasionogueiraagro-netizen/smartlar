@@ -5,7 +5,7 @@ class Settings:
     DB_USER = os.getenv("MYSQLUSER")
     DB_PASS = os.getenv("MYSQLPASSWORD")
     DB_NAME = os.getenv("MYSQLDATABASE")
-    DB_PORT = int(os.getenv("MYSQLPORT", 44842))
+    DB_PORT = int(os.getenv("MYSQLPORT", 3306))
 
     ZAPI_INSTANCE = os.getenv("3F1847ADAFDE21F3ABE79ED390C0144C")
     ZAPI_TOKEN = os.getenv("C619984FEC04E144B8F2E9C2")
