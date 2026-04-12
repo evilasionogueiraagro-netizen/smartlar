@@ -1,7 +1,7 @@
 import os
 
 class Settings:
-    DB_HOST = os.getenv("mysql.railway.internal")
+    DB_HOST = os.getenv("shinkansen.proxy.rlwy.net")
     DB_USER = os.getenv("root")
     DB_PASS = os.getenv("SVYTByDzVrvqBsrfkEaMpyXnUFzpkzKx")
     DB_NAME = os.getenv("railway")
